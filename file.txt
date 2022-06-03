@@ -1,0 +1,28 @@
+hive --service hiveserver2&
+
+CREATE TABLE EMPLOYEE(
+ID INT NOT NULL,
+NAME VARCHAR (20) NOT NULL,
+SALARY DECIMAL(18,2),
+constraint pk_ID primary key (ID)
+);
+
+
+#Select the table from MySQL and based on where clause, import data into HDFS: (Considering that target folder is not already exist)
+
+sqoop import --connect jdbc:mysql://localhost/pga28 --username root --password password --table EMPLOYEE --m 1 --direct --where "ID <= 3" --delete-target-dir --target-dir /sqoop_pga28
+
+sqoop import --connect jdbc:mysql://localhost/pga28 --username root --password password --table EMPLOYEE --m 1 --direct --incremental append --check-column ID --last-value 3  --target-dir /sqoop_pga28
+
+
+CREATE TABLE employee2(
+ID INT NOT NULL,
+NAME VARCHAR (20) NOT NULL,
+SALARY DECIMAL(18,2),
+constraint pk_ID primary key (ID)
+);
+
+sqoop export --connect jdbc:mysql://localhost/pga28 --username root --password password --table employee2 --m 1 --direct --export-dir /sqoop_pga28
+
+
+CREATE TABLE day_temp(day VARCHAR(10), temp int);
